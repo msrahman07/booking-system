@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'booking_system'
+      MYSQL_USER: 'appuser'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+volumes:
+  my-db:
