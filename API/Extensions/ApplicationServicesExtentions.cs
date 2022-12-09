@@ -24,6 +24,17 @@ namespace API.Extensions
                 // options.UseMySql(connStr, ServerVersion.AutoDetect(connStr)); // for pomelo
                 options.UseMySQL(connStr!);
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "AllowClient",
+                    policy =>
+                    {
+                        policy.AllowAnyHeader()
+                            .AllowCredentials()
+                            .AllowAnyMethod()
+                            .WithOrigins("http://localhost:3000");
+                    });
+            });
             return services;
         }
     }
