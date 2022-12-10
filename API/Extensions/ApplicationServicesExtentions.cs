@@ -18,6 +18,7 @@ namespace API.Extensions
             services.AddAutoMapper(typeof(MappingProfiles));
             services.AddSingleton<IDesignTimeServices, MysqlEntityFrameworkDesignTimeServices>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IAppointmentRepository,AppointmentRepository>();
             services.AddDbContext<DataContext>(options =>
             {
                 var connStr = config.GetConnectionString("DefaultConnection");

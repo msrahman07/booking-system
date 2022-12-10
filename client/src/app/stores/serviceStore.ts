@@ -10,6 +10,13 @@ export const loadServices = createAsyncThunk<IService[]>(
     }
 );
 
+export const addService = createAsyncThunk<IService, IService>(
+    'services/addService',
+    async (service: IService) => {
+        return await agent.Services.create(service);
+    }
+);
+
 const serviceSlice = createSlice({
     name: 'services',
     initialState: {
@@ -20,6 +27,10 @@ const serviceSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(loadServices.fulfilled, (state, action) => {
             state.services = action.payload;
+            state.loading = false;
+        });
+        builder.addCase(addService.fulfilled, (state, action) => {
+            state.services.push(action.payload);
             state.loading = false;
         });
     }

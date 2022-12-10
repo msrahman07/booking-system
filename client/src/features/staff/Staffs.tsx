@@ -39,7 +39,7 @@ const Staffs = () => {
       }
       <Button 
         variant="text"
-        onClick={() => dispatch(openModal(<CreateUpdateStaffForm />))}
+        onClick={() => dispatch(openModal(<div><CreateUpdateStaffForm /></div>))}
       >
         +
       </Button>

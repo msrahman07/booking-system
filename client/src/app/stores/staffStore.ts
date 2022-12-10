@@ -10,6 +10,13 @@ export const loadStaffs = createAsyncThunk<IStaff[]>(
     }
 );
 
+export const addStaffs = createAsyncThunk<IStaff, IStaff>(
+    'staffs/addStaffs',
+    async (staff: IStaff) => {
+        return await agent.Staffs.create(staff);
+    }
+);
+
 const staffSlice = createSlice({
     name: 'staffs',
     initialState: {
@@ -20,6 +27,10 @@ const staffSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(loadStaffs.fulfilled, (state, action) => {
             state.staffs = action.payload;
+            state.loading = false;
+        });
+        builder.addCase(addStaffs.fulfilled, (state, action) => {
+            state.staffs.push(action.payload);
             state.loading = false;
         });
     }

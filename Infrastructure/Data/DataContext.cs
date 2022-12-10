@@ -12,6 +12,7 @@ namespace Infrastructure.Data
         public DbSet<Guest> Guests { get; set; } = null!;
         public DbSet<Staff> Staffs { get; set; } = null!;
         public DbSet<Service> Services { get; set; } = null!;
+        public DbSet<Appointment> Appointments { get; set; } = null!;
         
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         // {

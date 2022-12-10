@@ -4,6 +4,8 @@ import Item from '../../app/shared/Item';
 import { useAppDispatch, useAppSelector } from '../../app/stores/hooks';
 import { loadServices, servicesList, servicesLoading } from '../../app/stores/serviceStore';
 import CircleIcon from '@mui/icons-material/Circle';
+import { openModal } from '../../app/stores/modalStore';
+import CreateUpdateServiceForm from './CreateUpdateServiceForm';
 
 const Services = () => {
   const services = useAppSelector(servicesList);
@@ -36,7 +38,12 @@ const Services = () => {
           ))}
         </div>
       }
-      <Button variant="text">+</Button>
+      <Button 
+        variant="text"
+        onClick={() => dispatch(openModal(<div><CreateUpdateServiceForm /></div>))}  
+      >
+        +
+      </Button>
     </div>
   )
 }

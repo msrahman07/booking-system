@@ -60,3 +60,18 @@ body {
   padding: 30px;
   outline: none;
 }
+
+.modal .modal-stack {
+  display: flex;
+  align-items: end;
+}
+
+.modal button {
+  background: #d2542a;
+  color: white;
+  bottom: 0;
+  width: fit-content;
+}
+.modal button:hover {
+  background: #d2542a;
+}

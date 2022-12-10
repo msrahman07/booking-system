@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from '../../app/stores/hooks';
 import PhoneIcon from '@mui/icons-material/Phone';
 import Item from '../../app/shared/Item';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { openModal } from '../../app/stores/modalStore';
+import CreateUpdateGuestForm from './CreateUpdateGuestForm';
 
 const Guests = () => {
   const guests = useAppSelector(guestsList);
@@ -40,7 +42,12 @@ const Guests = () => {
           ))}
         </div>
       }
-      <Button variant="text">+</Button>
+      <Button 
+        variant="text"
+        onClick={() => dispatch(openModal(<div><CreateUpdateGuestForm /></div>))}
+      >
+        +
+      </Button>
     </div>
   )
 }

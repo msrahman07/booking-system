@@ -10,6 +10,13 @@ export const loadGuests = createAsyncThunk<IGuest[]>(
     }
 );
 
+export const addGuest = createAsyncThunk<IGuest, IGuest>(
+    'guests/addGuest',
+    async (guest: IGuest) => {
+        return await agent.Guests.create(guest);
+    }
+);
+
 const guestSlice = createSlice({
     name: 'guests',
     initialState: {
@@ -20,6 +27,10 @@ const guestSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(loadGuests.fulfilled, (state, action) => {
             state.guests = action.payload;
+            state.loading = false;
+        });
+        builder.addCase(addGuest.fulfilled, (state, action) => {
+            state.guests.push(action.payload);
             state.loading = false;
         });
     }

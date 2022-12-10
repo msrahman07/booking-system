@@ -6,6 +6,7 @@ import Staffs from '../../features/staff/Staffs';
 
 function App() {
   return (
+    <>
     <Grid container spacing={1}>
       <Grid item sm={2.5}>
         <Guests />
@@ -20,6 +21,7 @@ function App() {
         Appointment
       </Grid>
     </Grid>
+    </>
     // <div className="App">
     //   <Guests />
     //   <Staffs />
