@@ -12,17 +12,17 @@ namespace API.Controllers
     [Route("[controller]")]
     public class CommonController<T> : ControllerBase where T : BaseEntity
     {
-        private readonly IGenericRepository<T> repo;
+        // private readonly IGenericRepository<T> repo;
 
-        public CommonController(IGenericRepository<T> repo)
-        {
-            this.repo = repo;
-        }
+        // public CommonController(IGenericRepository<T> repo)
+        // {
+        //     this.repo = repo;
+        // }
 
-        [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<T>>> GetAllItems()
-        {
-            return Ok(await repo.ListAsync());
-        }
+        // [HttpGet]
+        // public async Task<ActionResult<IReadOnlyList<T>>> GetAllItems()
+        // {
+        //     return Ok(await repo.ListAsync());
+        // }
     }
 }

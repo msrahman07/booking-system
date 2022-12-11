@@ -19,52 +19,141 @@ namespace Infrastructure.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<ResponseResult<AppointmentDto>> AddAppointmentAsync(AppointmentDto appointment)
+        public async Task<ResponseResult<AppointmentResponseDto>> AddAppointmentAsync(AppointmentRequestDto appointment)
         {
-            var guest = await context.Guests.FirstOrDefaultAsync(g => g.Id == appointment.GuestId);
-            var service = await context.Services.FirstOrDefaultAsync(s => s.Id == appointment.ServiceId);
-            var staff = await context.Staffs.FirstOrDefaultAsync(s => s.Id == appointment.StaffId);
-            
-            if(guest == null) return ResponseResult<AppointmentDto>.Failure("Guest doesn't exist");
-            if(service == null) return ResponseResult<AppointmentDto>.Failure("Service doesn't exist");
-            if(staff == null) return ResponseResult<AppointmentDto>.Failure("Staff doesn't exist");
+            //Validate appointment time
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            if (appointmentStartTime >= appointmentEndTime) return ResponseResult<AppointmentResponseDto>.Failure("Invalid appointment time, please select end time later than start time");
 
-            var newAppointment = new Appointment 
+            var guest = await GetGuestWithAppointments(appointment);
+            var service = await context.Services.FirstOrDefaultAsync(s => s.Id == appointment.ServiceId);
+            var staff = await GetStaffWithAppointments(appointment);
+
+            if (guest == null) return ResponseResult<AppointmentResponseDto>.Failure("Guest doesn't exist");
+            if (service == null) return ResponseResult<AppointmentResponseDto>.Failure("Service doesn't exist");
+            if (staff == null) return ResponseResult<AppointmentResponseDto>.Failure("Staff doesn't exist");
+
+            // Validate Guest and Staff Availability
+            if (staff.Appointments.Count() > 0) return ResponseResult<AppointmentResponseDto>.Failure($"Staff {staff.FirstName} is not available at given time");
+            if (guest.Appointments.Count() > 0) return ResponseResult<AppointmentResponseDto>.Failure($"Customer {guest.FirstName} is not available at given time");
+
+            var newAppointment = new Appointment
             {
                 Guest = guest,
                 Service = service,
-                Staff = staff
+                Staff = staff,
+                Date = appointment.Date.Date,
+                StartTime = appointmentStartTime,
+                EndTime = appointmentEndTime
             };
             await context.Appointments.AddAsync(newAppointment);
             var result = await context.SaveChangesAsync() > 0;
-            
-            return (result) ? ResponseResult<AppointmentDto>.Success(mapper.Map<Appointment, AppointmentDto>(newAppointment)) 
-                : ResponseResult<AppointmentDto>.Failure("Unable to create appointment");
+
+            return (result) ? ResponseResult<AppointmentResponseDto>.Success(mapper.Map<Appointment, AppointmentResponseDto>(newAppointment))
+                : ResponseResult<AppointmentResponseDto>.Failure("Unable to create appointment");
         }
 
-        public Task<string> DeleteAppointmentAsync(int id)
+        public async Task<ResponseResult<string>> DeleteAppointmentAsync(int id)
         {
-            throw new NotImplementedException();
+            var appointment = await context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
+            if (appointment == null) return ResponseResult<string>.Failure("AppointmentToUpdate doesn't exist");
+            context.Appointments.Remove(appointment);
+            var result = await context.SaveChangesAsync() > 0;
+
+            return (result) ? ResponseResult<string>.Success("Deleted")
+                : ResponseResult<string>.Failure("Unable to Delete appointment");
         }
 
-        public Task<AppointmentDto> GetAppointmentByIdAsync(int id)
+        public async Task<ResponseResult<AppointmentResponseDto>> GetAppointmentByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var appointment = await context.Appointments
+                .Include(a => a.Guest)
+                .Include(a => a.Service)
+                .Include(a => a.Staff)
+                .FirstOrDefaultAsync(a => a.Id == id);
+            if (appointment == null) return ResponseResult<AppointmentResponseDto>.Failure("AppointmentToUpdate doesn't exist");
+            return ResponseResult<AppointmentResponseDto>.Success(mapper.Map<Appointment, AppointmentResponseDto>(appointment));
         }
 
-        public async Task<IReadOnlyList<AppointmentDto>> GetAppointmentsAsync()
+        public async Task<IReadOnlyList<AppointmentResponseDto>> GetAppointmentsAsync()
         {
             var appointments = await context.Appointments
                 .Include(a => a.Guest)
                 .Include(a => a.Service)
                 .Include(a => a.Staff)
                 .ToListAsync();
-            return mapper.Map<IReadOnlyList<Appointment>, IReadOnlyList<AppointmentDto>>(appointments);
+            return mapper.Map<IReadOnlyList<Appointment>, IReadOnlyList<AppointmentResponseDto>>(appointments);
         }
 
-        public Task<AppointmentDto> UpdateAppointmentAsync(AppointmentDto appointment)
+        public async Task<ResponseResult<AppointmentResponseDto>> UpdateAppointmentAsync(AppointmentRequestDto appointment)
         {
-            throw new NotImplementedException();
+            //Validate appointment time
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            if (appointmentStartTime >= appointmentEndTime) return ResponseResult<AppointmentResponseDto>.Failure("Invalid appointment time, please select end time later than start time");
+
+            var appointmentToUpdate = await context.Appointments.FirstOrDefaultAsync(a => a.Id == appointment.Id);
+            if (appointmentToUpdate == null) return ResponseResult<AppointmentResponseDto>.Failure("Appointment doesn't exist");
+
+            if (appointmentToUpdate.Guest.Id != appointment.GuestId)
+            {
+                var guest = await GetGuestWithAppointments(appointment);
+                if (guest == null) return ResponseResult<AppointmentResponseDto>.Failure("Guest doesn't exist");
+                // Validate Staff Availability
+                if (guest.Appointments.Count() > 0) return ResponseResult<AppointmentResponseDto>.Failure($"Customer {guest.FirstName} is not available at given time");
+                appointmentToUpdate.Guest = guest;
+            }
+            if (appointmentToUpdate.Service.Id != appointment.ServiceId)
+            {
+                var service = await context.Services.FirstOrDefaultAsync(s => s.Id == appointment.ServiceId);
+                if (service == null) return ResponseResult<AppointmentResponseDto>.Failure("Service doesn't exist");
+                appointmentToUpdate.Service = service;
+            }
+            if (appointmentToUpdate.Staff.Id != appointment.StaffId)
+            {
+                var staff = await GetStaffWithAppointments(appointment);
+                if (staff == null) return ResponseResult<AppointmentResponseDto>.Failure("Staff doesn't exist");
+                // Validate Staff Availability
+                if (staff.Appointments.Count() > 0) return ResponseResult<AppointmentResponseDto>.Failure($"Staff {staff.FirstName} is not available at given time");
+                appointmentToUpdate.Staff = staff;
+            }
+            appointmentToUpdate.Date = appointment.Date;
+            appointmentToUpdate.StartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
+            appointmentToUpdate.EndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var result = await context.SaveChangesAsync() > 0;
+
+            return (result) ? ResponseResult<AppointmentResponseDto>.Success(mapper.Map<Appointment, AppointmentResponseDto>(appointmentToUpdate))
+                : ResponseResult<AppointmentResponseDto>.Failure("Unable to update appointment");
+        }
+
+        private async Task<Guest> GetGuestWithAppointments(AppointmentRequestDto appointment)
+        {
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var guest = await context.Guests
+                    .Include(s => s.Appointments
+                                    .Where(a => a.Date == appointment.Date && a.Id != appointment.Id)
+                                    .Where(a =>
+                                        (appointmentStartTime >= a.StartTime && appointmentStartTime <= a.EndTime) ||
+                                        (appointmentEndTime >= a.StartTime && appointmentEndTime <= a.EndTime)
+                                    ))
+                    .FirstOrDefaultAsync(g => g.Id == appointment.GuestId);
+            return guest ?? null!;
+        }
+        private async Task<Staff> GetStaffWithAppointments(AppointmentRequestDto appointment)
+        {
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var staff = await context.Staffs
+                    .Include(s => s.Appointments
+                                    .Where(a => a.Date == appointment.Date && a.Id != appointment.Id)
+                                    .Where(a =>
+                                        (appointmentStartTime >= a.StartTime && appointmentStartTime <= a.EndTime) ||
+                                        (appointmentEndTime >= a.StartTime && appointmentEndTime <= a.EndTime)
+                                    ))
+                    .FirstOrDefaultAsync(s => s.Id == appointment.StaffId);
+            return staff ?? null!;
         }
     }
 }

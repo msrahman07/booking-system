@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -6,52 +7,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class GuestRepository : IGuestRepository
+    public class GuestRepository : GenericRepository<Guest, GuestDto>, IGenericRepository<Guest, GuestDto>
     {
-        private readonly DataContext context;
-        private readonly IMapper mapper;
-
-        public GuestRepository(DataContext context, IMapper mapper)
+        public GuestRepository(DataContext context, IMapper mapper) : base(context, mapper)
         {
-            this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<Guest> AddGuestAsync(Guest guest)
+        public override async Task<IReadOnlyList<GuestDto>> ListAsync()
         {
-            await context.Guests.AddAsync(guest);
-            var result = await context.SaveChangesAsync() > 0;
-            return (result) ? guest : null!;
+            var items = await context.Guests
+                .Include(g => g.Appointments)
+                .ThenInclude(a => a.Service)
+                .Include(g => g.Appointments)
+                .ThenInclude(a => a.Staff)
+                .ToListAsync();
+            return (items != null) ? mapper.Map<IReadOnlyList<Guest>, IReadOnlyList<GuestDto>>(items) : null!;
         }
 
-        public async Task<string> DeleteGuestAsync(int id)
+        public override async Task<GuestDto> GetByIdAsync(int id)
         {
-            var guest = await context.Guests.FindAsync(id);
-            if(guest == null) return "Guest with id doesn't exist";
-            context.Guests.Remove(guest);
-            var result = await context.SaveChangesAsync() > 0;
-            return (result) ? "Success" : "Unable to delete guest";
-        }
+            var item = await context.Guests
+                .Include(g => g.Appointments)
+                .ThenInclude(a => a.Service)
+                .Include(g => g.Appointments)
+                .ThenInclude(a => a.Staff)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        public async Task<Guest> GetGuestByIdAsync(int id)
-        {
-            var guest = await context.Guests.FirstOrDefaultAsync(g => g.Id == id);
-
-            return guest ?? null!;
-        }
-
-        public async Task<IReadOnlyList<Guest>> GetGuestsAsync()
-        {
-            return await context.Guests.ToListAsync();
-        }
-
-        public async Task<Guest> UpdateGuestAsync(Guest guest)
-        {
-            var guestToUpdate = await context.Guests.FirstOrDefaultAsync(g => g.Id == guest.Id);
-            if(guestToUpdate == null) return null!;
-            mapper.Map(guest, guestToUpdate);
-            var result = await context.SaveChangesAsync() > 0;
-            return (result) ? guestToUpdate : null!;
-        }
+            return (item != null) ? mapper.Map<Guest, GuestDto>(item) : null!;
+        }        
     }
 }

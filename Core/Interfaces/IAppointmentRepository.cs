@@ -10,10 +10,10 @@ namespace Core.Interfaces
 {
     public interface IAppointmentRepository
     {
-        Task<IReadOnlyList<AppointmentDto>> GetAppointmentsAsync();
-        Task<AppointmentDto> GetAppointmentByIdAsync(int id);
-        Task<ResponseResult<AppointmentDto>> AddAppointmentAsync(AppointmentDto appointment);
-        Task<AppointmentDto> UpdateAppointmentAsync(AppointmentDto appointment);
-        Task<string> DeleteAppointmentAsync(int id);
+        Task<IReadOnlyList<AppointmentResponseDto>> GetAppointmentsAsync();
+        Task<ResponseResult<AppointmentResponseDto>> GetAppointmentByIdAsync(int id);
+        Task<ResponseResult<AppointmentResponseDto>> AddAppointmentAsync(AppointmentRequestDto appointment);
+        Task<ResponseResult<AppointmentResponseDto>> UpdateAppointmentAsync(AppointmentRequestDto appointment);
+        Task<ResponseResult<string>> DeleteAppointmentAsync(int id);
     }
 }

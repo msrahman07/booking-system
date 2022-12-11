@@ -14,6 +14,7 @@ namespace Core.Entities
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; } = null!;
+        public IReadOnlyList<Appointment> Appointments { get; set; } = new List<Appointment>();
         
     }
 }

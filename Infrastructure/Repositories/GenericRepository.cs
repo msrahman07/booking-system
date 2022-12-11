@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -10,11 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
+    public class GenericRepository<T, TDto> : IGenericRepository<T, TDto> 
+        where T : BaseEntity
+        where TDto : BaseDto
 
     {
-        private readonly DataContext context;
-        private readonly IMapper mapper;
+        protected readonly DataContext context;
+        protected readonly IMapper mapper;
 
         public GenericRepository(DataContext context, IMapper mapper)
         {
@@ -22,11 +21,11 @@ namespace Infrastructure.Repositories
             this.mapper = mapper;
         }
 
-        public async Task<T> AddAsync(T t)
+        public async Task<TDto> AddAsync(T t)
         {
             await context.Set<T>().AddAsync(t);
             var result = await context.SaveChangesAsync() > 0;
-            return (result) ? t : null!;
+            return (result) ? mapper.Map<T, TDto>(t) : null!;
         }
 
         public async Task<string> DeleteAsync(int id)
@@ -38,25 +37,26 @@ namespace Infrastructure.Repositories
             return (result) ? "success" : "Unable to delete";
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public virtual async Task<TDto> GetByIdAsync(int id)
         {
             var item = await context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
 
-            return item ?? null!;
+            return (item != null) ? mapper.Map<T, TDto>(item) : null!;
         }
 
-        public async Task<IReadOnlyList<T>> ListAsync()
+        public virtual async Task<IReadOnlyList<TDto>> ListAsync()
         {
-            return await context.Set<T>().ToListAsync();
+            var items = await context.Set<T>().ToListAsync();
+            return (items != null) ? mapper.Map<IReadOnlyList<T>, IReadOnlyList<TDto>>(items) : null!;
         }
 
-        public async Task<T> UpdateAsync(T item)
+        public async Task<TDto> UpdateAsync(T item)
         {
             var itemToUpdate = await context.Set<T>().FirstOrDefaultAsync(x => x.Id == item.Id);
             if(itemToUpdate == null) return null!;
             mapper.Map(item, itemToUpdate);
             var result = await context.SaveChangesAsync() > 0;
-            return (result) ? itemToUpdate : null!;
+            return (result) ? mapper.Map<T, TDto>(itemToUpdate) : null!;
         }
     }
 }
