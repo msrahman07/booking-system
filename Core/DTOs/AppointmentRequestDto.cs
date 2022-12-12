@@ -11,15 +11,15 @@ namespace Core.DTOs
         public int StaffId { get; set; }
         public DateTime Date { get; set; }= new DateTime();
         
-        public CustomerTimeSpan StartTime { get; set; } = null!;
+        public CustomTimeSpan StartTime { get; set; } = null!;
         
-        public CustomerTimeSpan EndTime { get; set; } = null!;
+        public CustomTimeSpan EndTime { get; set; } = null!;
     }
 
-    public class CustomerTimeSpan 
+    public class CustomTimeSpan 
     {
-        public int Hour { get; set; }
-        public int Minute { get; set; }
-        public int Second { get; set; } = 0;
+        public int Hours { get; set; }
+        public int Minutes { get; set; }
+        public int Seconds { get; set; } = 0;
     }
 }

@@ -3,13 +3,15 @@ import guestReducer from './guestStore';
 import staffReducer from './staffStore';
 import serviceReducer from './serviceStore';
 import modalReducer from './modalStore';
+import appointmentReducer from './appointmentStore';
 
 export const store = configureStore({
     reducer: {
       guestStore: guestReducer,
       staffStore: staffReducer,
       serviceStore: serviceReducer,
-      modalStore: modalReducer
+      modalStore: modalReducer,
+      appointmentStore: appointmentReducer
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
+import { IAppointmentRequest, IAppointmentResponse } from "../models/appointment";
 import { IGuest } from "../models/guest";
 import { IService } from "../models/service";
 import { IStaff } from "../models/staff";
@@ -34,11 +35,19 @@ const Services = {
     create: (service: IService) => requests.post<IService>(`/services`, service),
     delete: (id: number) => requests.delete<string>(`/services/${id}`),
 };
+const Appointments = {
+    list: () => requests.get<IAppointmentResponse[]>('/appointments'),
+    listByDate: (date: string) => requests.get<IAppointmentResponse[]>(`/appointments/${date}`),
+    details: (id: number) => requests.get<IAppointmentResponse>(`/appointments/${id}`),
+    create: (appointment: IAppointmentRequest) => requests.post<IAppointmentResponse>(`/appointments`, appointment),
+    delete: (id: number) => requests.delete<string>(`/appointments/${id}`),
+};
 
 const agent = {
     Guests,
     Staffs,
-    Services
+    Services,
+    Appointments
 };
 
 export default agent;

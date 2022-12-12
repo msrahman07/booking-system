@@ -1,5 +1,6 @@
 import { Grid } from '@mui/material';
 import React from 'react';
+import Appointments from '../../features/appointment/Appointments';
 import Guests from '../../features/guest/Guests';
 import Services from '../../features/service/Services';
 import Staffs from '../../features/staff/Staffs';
@@ -18,7 +19,7 @@ function App() {
         <Services />
       </Grid>
       <Grid item sm={4.5}>
-        Appointment
+        <Appointments />
       </Grid>
     </Grid>
     </>

@@ -11,6 +11,7 @@ namespace Core.Interfaces
     public interface IAppointmentRepository
     {
         Task<IReadOnlyList<AppointmentResponseDto>> GetAppointmentsAsync();
+        Task<IReadOnlyList<AppointmentResponseDto>> GetAppointmentsByDateAsync(DateTime date);
         Task<ResponseResult<AppointmentResponseDto>> GetAppointmentByIdAsync(int id);
         Task<ResponseResult<AppointmentResponseDto>> AddAppointmentAsync(AppointmentRequestDto appointment);
         Task<ResponseResult<AppointmentResponseDto>> UpdateAppointmentAsync(AppointmentRequestDto appointment);

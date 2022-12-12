@@ -75,3 +75,21 @@ body {
 .modal button:hover {
   background: #d2542a;
 }
+
+.modal .time-btn, .modal .time-btn:hover{
+  background: aliceblue;
+  color: black;
+  height: 57px;
+  width: 100%;
+  align-items: center;
+  text-transform: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal .calendar button {
+  background: aliceblue;
+  color: #d2542a;
+  bottom: 0;
+  width: fit-content;
+}

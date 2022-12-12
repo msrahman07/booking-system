@@ -59,7 +59,7 @@ const CreateUpdateGuestForm = () => {
                         fullWidth
                         id="firstName"
                         name="firstName"
-                        label="Name"
+                        label="First Name"
                         value={formik.values.firstName}
                         onChange={formik.handleChange}
                         error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -69,7 +69,7 @@ const CreateUpdateGuestForm = () => {
                         fullWidth
                         id="lastName"
                         name="lastName"
-                        label="lastName"
+                        label="Last Name"
                         value={formik.values.lastName}
                         onChange={formik.handleChange}
                         error={formik.touched.lastName && Boolean(formik.errors.lastName)}

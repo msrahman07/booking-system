@@ -22,8 +22,8 @@ namespace Infrastructure.Repositories
         public async Task<ResponseResult<AppointmentResponseDto>> AddAppointmentAsync(AppointmentRequestDto appointment)
         {
             //Validate appointment time
-            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
-            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hours, appointment.StartTime.Minutes, appointment.StartTime.Seconds);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hours, appointment.EndTime.Minutes, appointment.EndTime.Seconds);
             if (appointmentStartTime >= appointmentEndTime) return ResponseResult<AppointmentResponseDto>.Failure("Invalid appointment time, please select end time later than start time");
 
             var guest = await GetGuestWithAppointments(appointment);
@@ -89,8 +89,8 @@ namespace Infrastructure.Repositories
         public async Task<ResponseResult<AppointmentResponseDto>> UpdateAppointmentAsync(AppointmentRequestDto appointment)
         {
             //Validate appointment time
-            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
-            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hours, appointment.StartTime.Minutes, appointment.StartTime.Seconds);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hours, appointment.EndTime.Minutes, appointment.EndTime.Seconds);
             if (appointmentStartTime >= appointmentEndTime) return ResponseResult<AppointmentResponseDto>.Failure("Invalid appointment time, please select end time later than start time");
 
             var appointmentToUpdate = await context.Appointments.FirstOrDefaultAsync(a => a.Id == appointment.Id);
@@ -119,32 +119,43 @@ namespace Infrastructure.Repositories
                 appointmentToUpdate.Staff = staff;
             }
             appointmentToUpdate.Date = appointment.Date;
-            appointmentToUpdate.StartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
-            appointmentToUpdate.EndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            appointmentToUpdate.StartTime = new TimeSpan(appointment.StartTime.Hours, appointment.StartTime.Minutes, appointment.StartTime.Seconds);
+            appointmentToUpdate.EndTime = new TimeSpan(appointment.EndTime.Hours, appointment.EndTime.Minutes, appointment.EndTime.Seconds);
             var result = await context.SaveChangesAsync() > 0;
 
             return (result) ? ResponseResult<AppointmentResponseDto>.Success(mapper.Map<Appointment, AppointmentResponseDto>(appointmentToUpdate))
                 : ResponseResult<AppointmentResponseDto>.Failure("Unable to update appointment");
         }
 
+        async Task<IReadOnlyList<AppointmentResponseDto>> IAppointmentRepository.GetAppointmentsByDateAsync(DateTime date)
+        {
+            var appointments = await context.Appointments
+                .Include(a => a.Guest)
+                .Include(a => a.Service)
+                .Include(a => a.Staff)
+                .Where(a => a.Date == date)
+                .ToListAsync();
+            return mapper.Map<IReadOnlyList<Appointment>, IReadOnlyList<AppointmentResponseDto>>(appointments);
+        }
+
         private async Task<Guest> GetGuestWithAppointments(AppointmentRequestDto appointment)
         {
-            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
-            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hours, appointment.StartTime.Minutes, appointment.StartTime.Seconds);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hours, appointment.EndTime.Minutes, appointment.EndTime.Seconds);
             var guest = await context.Guests
-                    .Include(s => s.Appointments
-                                    .Where(a => a.Date == appointment.Date && a.Id != appointment.Id)
-                                    .Where(a =>
-                                        (appointmentStartTime >= a.StartTime && appointmentStartTime <= a.EndTime) ||
-                                        (appointmentEndTime >= a.StartTime && appointmentEndTime <= a.EndTime)
-                                    ))
+                    .Include(s => s.Appointments)
+                                    // .Where(a => a.Date == appointment.Date && a.Id != appointment.Id)
+                                    // .Where(a =>
+                                    //     (appointmentStartTime >= a.StartTime && appointmentStartTime <= a.EndTime) ||
+                                    //     (appointmentEndTime >= a.StartTime && appointmentEndTime <= a.EndTime)
+                                    // ))
                     .FirstOrDefaultAsync(g => g.Id == appointment.GuestId);
             return guest ?? null!;
         }
         private async Task<Staff> GetStaffWithAppointments(AppointmentRequestDto appointment)
         {
-            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hour, appointment.StartTime.Minute, appointment.StartTime.Second);
-            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hour, appointment.EndTime.Minute, appointment.EndTime.Second);
+            var appointmentStartTime = new TimeSpan(appointment.StartTime.Hours, appointment.StartTime.Minutes, appointment.StartTime.Seconds);
+            var appointmentEndTime = new TimeSpan(appointment.EndTime.Hours, appointment.EndTime.Minutes, appointment.EndTime.Seconds);
             var staff = await context.Staffs
                     .Include(s => s.Appointments
                                     .Where(a => a.Date == appointment.Date && a.Id != appointment.Id)
