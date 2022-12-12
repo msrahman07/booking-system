@@ -33,12 +33,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseRouting();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 // app.UseHttpsRedirection();
 app.UseCors("AllowClient");
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToController("Index", "Fallback");
 
-app.Run();
+await app.RunAsync();

@@ -1,4 +1,4 @@
-import { Box, Modal, Typography } from '@mui/material';
+import { Box, Modal } from '@mui/material';
 import React from 'react'
 import { useAppDispatch, useAppSelector } from '../stores/hooks';
 import { closeModal, modalContent, modalState } from '../stores/modalStore';

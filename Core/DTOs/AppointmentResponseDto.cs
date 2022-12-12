@@ -15,6 +15,7 @@ namespace Core.DTOs
         public int StaffId { get; set; }
         public string StaffFullName { get; set; } = null!;
         public string Date { get; set; } = null!;
+        public bool Completed { get; set; } = false;
         
         public TimeSpan StartTime { get; set; }
         

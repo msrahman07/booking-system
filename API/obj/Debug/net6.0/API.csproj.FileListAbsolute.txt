@@ -68,3 +68,4 @@
 /home/shahriar/Desktop/Codes/projects/booking-system/API/bin/Debug/net6.0/Microsoft.Extensions.DependencyInjection.dll
 /home/shahriar/Desktop/Codes/projects/booking-system/API/bin/Debug/net6.0/AutoMapper.dll
 /home/shahriar/Desktop/Codes/projects/booking-system/API/bin/Debug/net6.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/home/shahriar/Desktop/Codes/projects/booking-system/API/bin/Debug/net6.0/API.staticwebassets.runtime.json

@@ -1,11 +1,9 @@
 import React from 'react'
 import * as yup from 'yup';
-import { ErrorMessage, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import { Button, TextField } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useAppDispatch } from '../../app/stores/hooks';
-import { IService } from '../../app/models/service';
-import { addService } from '../../app/stores/serviceStore';
 import { closeModal } from '../../app/stores/modalStore';
 import { IGuest } from '../../app/models/guest';
 import { addGuest } from '../../app/stores/guestStore';

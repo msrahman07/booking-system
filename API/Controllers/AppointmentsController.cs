@@ -20,7 +20,7 @@ namespace API.Controllers
         }
         
         [HttpGet("{date}")]
-        public async Task<ActionResult<IReadOnlyList<AppointmentResponseDto>>> GetAppointmentsList(DateTime date)
+        public async Task<ActionResult<IReadOnlyList<AppointmentResponseDto>>> GetAppointmentsListByDate(DateTime date)
         {
             return Ok(await appointmentRepo.GetAppointmentsByDateAsync(date));
         }
@@ -30,6 +30,25 @@ namespace API.Controllers
         {
             var newAppointment = await appointmentRepo.AddAppointmentAsync(appointment);
             return (newAppointment != null) ? HandleResult(newAppointment) : BadRequest("Unable to create new appointment");
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<AppointmentResponseDto>> UpdateAppointment(int id, AppointmentRequestDto appointment)
+        {   appointment.Id = id;
+            var newAppointment = await appointmentRepo.UpdateAppointmentAsync(appointment);
+            return (newAppointment != null) ? Ok(HandleResult(newAppointment)) : BadRequest("Unable to update new appointment");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<string>> DeleteAppointment(int id)
+        {
+            return Ok(await appointmentRepo.DeleteAppointmentAsync(id));
+        }
+
+        [HttpPut("{id}/complete")]
+        public async Task<ActionResult<bool>> CompleteAppointment(int id)
+        {   
+            return await appointmentRepo.CompleteAppointment(id);
         }
     }
 }

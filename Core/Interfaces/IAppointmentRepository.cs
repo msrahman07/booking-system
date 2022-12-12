@@ -16,5 +16,6 @@ namespace Core.Interfaces
         Task<ResponseResult<AppointmentResponseDto>> AddAppointmentAsync(AppointmentRequestDto appointment);
         Task<ResponseResult<AppointmentResponseDto>> UpdateAppointmentAsync(AppointmentRequestDto appointment);
         Task<ResponseResult<string>> DeleteAppointmentAsync(int id);
+        Task<bool> CompleteAppointment(int id);
     }
 }

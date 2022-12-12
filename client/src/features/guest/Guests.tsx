@@ -1,6 +1,5 @@
-import { Button, CircularProgress, Paper, Typography } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import React, { useEffect } from 'react'
-import agent from '../../app/api/agent';
 import { guestsList, guestsLoading, loadGuests } from '../../app/stores/guestStore';
 import { useAppDispatch, useAppSelector } from '../../app/stores/hooks';
 import PhoneIcon from '@mui/icons-material/Phone';

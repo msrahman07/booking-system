@@ -1,7 +1,7 @@
 import { Button, CircularProgress, FormControl, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import Item from '../../app/shared/Item';
-import { appointmentsList, appointmentsLoading, loadAppointmentsByDate} from '../../app/stores/appointmentStore';
+import { appointmentsListByDate, appointmentsLoading, loadAppointments, loadAppointmentsByDate, setCurrentDate } from '../../app/stores/appointmentStore';
 import { useAppDispatch, useAppSelector } from '../../app/stores/hooks';
 import { openModal } from '../../app/stores/modalStore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -12,17 +12,35 @@ import dayjs from 'dayjs';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CustomTimeAmPmViewer from './helpers/CustomTimeAmPmViewer';
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import { IAppointmentResponse } from '../../app/models/appointment';
 
 const Appointments = () => {
-  const appointments = useAppSelector(appointmentsList);
+  const appointments = useAppSelector(appointmentsListByDate);
   const loading = useAppSelector(appointmentsLoading);
   const dispatch = useAppDispatch();
   const [date, setDate] = useState(dayjs(new Date().toDateString()).format('MM-DD-YYYY'))
 
   useEffect(() => {
-    // dispatch(setLoadingTrue())
+    dispatch(loadAppointments())
     dispatch(loadAppointmentsByDate(date));
+    dispatch(setCurrentDate(date));
   }, [date]);
+
+  const onPassAppointment = (id: number) => {
+    let appointment: IAppointmentResponse | null = null;
+
+    if(id !== null) {
+      appointments.forEach(a => {
+          if (a.id === id) {
+              appointment = a;
+          }
+      })
+    }
+    if(appointment !== null) {
+      dispatch(openModal(<CreateUpdateAppointmentForm appointment={appointment} />))
+    }
+  }
 
   return (
     <div className='sec-column'>
@@ -34,7 +52,7 @@ const Appointments = () => {
         <CircularProgress style={{ marginLeft: '50%', marginTop: '50%' }} />
         :
         <div className='sec'>
-          <FormControl fullWidth style={{marginTop: '10px'}}>
+          <FormControl fullWidth style={{ marginTop: '10px' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DesktopDatePicker
                 label="Appointment Date" inputFormat="MM/DD/YYYY"
@@ -43,16 +61,22 @@ const Appointments = () => {
               />
             </LocalizationProvider>
           </FormControl>
-          {appointments.length == 0 &&
+          {appointments.length === 0 &&
             <Item>No Appointments on this date</Item>
           }
           {appointments.map(appointment => (
             <Item
               key={appointment.id}>
-              <span>{appointment.guestFullName}</span>
+              <span>
+                {appointment.guestFullName}
+                <Button
+                  onClick={() => onPassAppointment(appointment.id!)}
+                  style={{ float: 'right', cursor: 'pointer', width: 'fit-content', borderRadius: '50%' }}><ModeEditOutlineOutlinedIcon
+                    style={{ color: '#d2542a' }} /></Button>
+              </span>
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <AccessTimeIcon fontSize="small" color="action" /><small style={{ marginLeft: '3px', marginTop: '4px' }}>
-                <CustomTimeAmPmViewer time={appointment.startTime}/> - <CustomTimeAmPmViewer time={appointment.endTime}/></small>
+                  <CustomTimeAmPmViewer time={appointment.startTime} /> - <CustomTimeAmPmViewer time={appointment.endTime} /></small>
               </span>
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <SpaOutlinedIcon fontSize="small" color="action" /><small style={{ marginLeft: '3px', marginTop: '4px' }}>{appointment.serviceName}</small>
@@ -66,7 +90,7 @@ const Appointments = () => {
       }
       <Button
         variant="text"
-        onClick={() => dispatch(openModal(<div><CreateUpdateAppointmentForm /></div>))}
+        onClick={() => dispatch(openModal(<CreateUpdateAppointmentForm appointment={null} />))}
       >
         +
       </Button>

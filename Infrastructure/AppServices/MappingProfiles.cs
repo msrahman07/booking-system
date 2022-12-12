@@ -12,6 +12,7 @@ namespace Infrastructure.AppServices
             CreateMap<Guest, Guest>();
             CreateMap<Staff, Staff>();
             CreateMap<Service, Service>();
+            CreateMap<Appointment, Appointment>();
             CreateMap<Appointment, AppointmentResponseDto>()
                 .ForMember(d => d.Date, o => o.MapFrom(s => s.Date.ToString("MM/dd/yyyy")))
                 .ForMember(d => d.GuestFullName, o => o.MapFrom(s => s.Guest.FirstName + " "+ s.Guest.LastName))

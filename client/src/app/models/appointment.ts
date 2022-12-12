@@ -9,9 +9,11 @@ export interface IAppointmentResponse {
     date: Date;
     startTime: Date;
     endTime: Date;
+    completed: boolean;
 }
 
 export interface IAppointmentRequest {
+    id?: number;
     guestId: number;
     serviceId: number;
     staffId: number;

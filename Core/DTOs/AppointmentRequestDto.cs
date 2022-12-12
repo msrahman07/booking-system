@@ -9,6 +9,8 @@ namespace Core.DTOs
         public int GuestId { get; set; }
         public int ServiceId { get; set; }
         public int StaffId { get; set; }
+        public bool Completed { get; set; } = false;
+
         public DateTime Date { get; set; }= new DateTime();
         
         public CustomTimeSpan StartTime { get; set; } = null!;

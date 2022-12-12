@@ -14,6 +14,27 @@ namespace Infrastructure.Data
         public DbSet<Service> Services { get; set; } = null!;
         public DbSet<Appointment> Appointments { get; set; } = null!;
         
+        // protected override async void OnModelCreating(ModelBuilder builder)
+        // {
+        //     base.OnModelCreating(builder);
+
+        //     // builder.Entity<Appointment>(x => x.HasKey(a => new {a.GuestId, a.StaffId, a.ServiceId}));
+        //     builder.Entity<Appointment>()
+        //         .HasOne(a => a.Guest)
+        //         .WithMany(g => g.Appointments)
+        //         // .HasForeignKey(a => a.GuestId)
+        //         .OnDelete(DeleteBehavior.Cascade);
+            
+        //     builder.Entity<Appointment>()
+        //         .HasOne(a => a.Staff)
+        //         .WithMany(s => s.Appointments)
+        //         // .HasForeignKey(a => a.StaffId)
+        //         .OnDelete(DeleteBehavior.Cascade);
+
+        //     builder.Entity<Appointment>()
+        //         .HasOne(a => a.Service);
+        // }
+
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         // {
         //     var configuration = new ConfigurationBuilder()

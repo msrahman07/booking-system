@@ -23,11 +23,7 @@ function App() {
       </Grid>
     </Grid>
     </>
-    // <div className="App">
-    //   <Guests />
-    //   <Staffs />
-    //   <Services />
-    // </div>
+    
   );
 }
 

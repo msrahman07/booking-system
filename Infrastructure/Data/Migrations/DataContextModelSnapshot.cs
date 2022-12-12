@@ -25,6 +25,9 @@ namespace Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("Completed")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
